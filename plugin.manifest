@@ -1,0 +1,7 @@
+pluginclassname=FireBIEST
+pluginname=FireBIEST
+origin=data-quest
+version=1.5
+description=Ein Entwicklungstool, um Javascript per JSLint nach potentiellen Fehlern und Coding-Style durchzugehen (auch Plugin-JS-Dateien), Unit-Tests durchzuführen und den HTML-Code von Stud.IP nach veralteten Codestrukturen wie blockquote zu durchsuchen. Nicht für reale Stud.IP-Systeme geeignet!
+studipMinVersion=2.1
+studipMaxVersion=10
