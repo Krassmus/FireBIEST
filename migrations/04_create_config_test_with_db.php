@@ -10,7 +10,7 @@ class CreateConfigTestWithDb extends Migration {
     public function up() {
 	    $config = Config::get();
         if (!isset($config["FIREBIEST_TEST_WITH_DB"])) {
-            Config::get()->create("FIREBIEST_TEST_WITH_DB", array('section' => "FireBIEST", 'is_default' => 0, 'value' => 0, 'type' => "boolean", 'range' => "global", 'description' => "should we also use unit-tests that can handle a mock-DB?"));
+            Config::get()->create("FIREBIEST_TEST_WITH_DB", array('section' => "FireBIEST", 'is_default' => 0, 'value' => 0, 'type' => "boolean", 'range' => "global", 'description' => "should we also use unit-tests that can handle a mock-DB?", 'comment' => ""));
         }
 	}
 	

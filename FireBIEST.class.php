@@ -78,8 +78,13 @@ class FireBIEST extends StudIPPlugin implements SystemPlugin {
         $navigation = new AutoNavigation(_("Model-Tests"), PluginEngine::getURL($this, array(), 'tests'));
         $navigation->setImage($GLOBALS['ABSOLUTE_URI_STUDIP'].$this->getPluginPath().'/images/unit-test_white.png');
         Navigation::addItem('/FireBIEST/tests', $navigation);
-        //Settings:
+        
         if ($GLOBALS['perm']->have_perm("root")) {
+            //Datenbank
+            $navigation = new AutoNavigation(_("Datenbank"), PluginEngine::getURL($this, array(), 'database'));
+            $navigation->setImage($GLOBALS['ABSOLUTE_URI_STUDIP'].$this->getPluginPath().'/images/model_white.png');
+            Navigation::addItem('/FireBIEST/database', $navigation);
+            //Settings:
             $navigation = new AutoNavigation(_("Einstellungen"), PluginEngine::getURL($this, array(), 'settings'));
             $navigation->setImage(Assets::image_path("icons/16/white/admin.png"));
             Navigation::addItem('/FireBIEST/settings', $navigation);
@@ -148,9 +153,20 @@ class FireBIEST extends StudIPPlugin implements SystemPlugin {
         print $template->render();
     }
     
+    public function database_action() {
+        if (!$GLOBALS['perm']->have_perm("root")) {
+    	    throw new AccessDeniedException(_("Sie haben keinen Zugriff auf diese Methode."));
+    	}
+        Navigation::getItem('/FireBIEST/database')->setImage(Assets::image_path($GLOBALS['ABSOLUTE_URI_STUDIP'].$this->getPluginPath().'/images/model_black.png'));
+    	
+        $template = $this->template_factory->open($this->template_path.'/adminer.php');
+        $template->set_layout($GLOBALS['template_factory']->open('layouts/base_without_infobox'));
+        $template->set_attribute('url', $this->getPluginURL()."/adminer/adminer.php");
+        echo $template->render();
+    }
+    
     public function settings_action() {
-    	global $perm;
-    	if (!$perm->have_perm("root")) {
+    	if (!$GLOBALS['perm']->have_perm("root")) {
     	    throw new AccessDeniedException(_("Sie haben keinen Zugriff auf diese Methode."));
     	}
         
@@ -181,8 +197,7 @@ class FireBIEST extends StudIPPlugin implements SystemPlugin {
     }
     
     public function savesettings_action() {
-    	global $perm;
-    	if ($perm->have_perm("root") && strpos(Request::get("config_name"), "FIREBIEST_") !== false) {
+    	if ($GLOBALS['perm']->have_perm("root") && strpos(Request::get("config_name"), "FIREBIEST_") !== false) {
             Config::get()->store(Request::get("config_name"), array('value' => Request::get("checked")));
     	}
     }

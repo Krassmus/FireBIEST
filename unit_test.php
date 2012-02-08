@@ -1,6 +1,6 @@
 <?php
 
-# Copyright (c)  2007-2011 - Marcus Lunzenauer <mlunzena@uos.de>, Rasmus Fuhse <fuhse@data-quest.de>
+# Copyright (c)  2007-2012 - Marcus Lunzenauer <mlunzena@uos.de>, Rasmus Fuhse <fuhse@data-quest.de>
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
@@ -34,6 +34,7 @@ ini_set('include_path', $inc_path);
 require_once dirname(__file__).'/classes/simpletest/unit_tester.php';
 require_once dirname(__file__).'/classes/simpletest/reporter.php';
 require_once dirname(__file__).'/classes/simpletest/collector.php';
+require_once dirname(__file__).'/classes/simpletest/mock_objects.php';
 
 # load varstream for easier filesystem testing
 require_once dirname(__file__).'/classes/varstream.php';
@@ -65,7 +66,6 @@ if ($_REQUEST['path']) {
 }
 
 $all->run(new TextReporter());
-
 
 //Abräumen der mock_db_ Tabellen:
 if ($_REQUEST['clean']) {
