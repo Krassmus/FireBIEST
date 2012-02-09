@@ -159,6 +159,14 @@ class FireBIEST extends StudIPPlugin implements SystemPlugin {
     	}
         Navigation::getItem('/FireBIEST/database')->setImage(Assets::image_path($GLOBALS['ABSOLUTE_URI_STUDIP'].$this->getPluginPath().'/images/model_black.png'));
     	
+        $config_file = fopen(dirname(__file__)."/adminer/config.php", "w");
+        fwrite($config_file, "<?php ");
+        fwrite($config_file, '$STUDIP_DB_SERVER = "'.$GLOBALS['DB_STUDIP_HOST'].'"; ');
+        fwrite($config_file, '$STUDIP_DB_USER = "'.$GLOBALS['DB_STUDIP_USER'].'"; ');
+        fwrite($config_file, '$STUDIP_DB_NAME = "'.$GLOBALS['DB_STUDIP_DATABASE'].'"; ');
+        fwrite($config_file, '$STUDIP_DB_PASSWORD = "'.$GLOBALS['DB_STUDIP_PASSWORD'].'"; ');
+        fclose($config_file);
+        
         $template = $this->template_factory->open($this->template_path.'/adminer.php');
         $template->set_layout($GLOBALS['template_factory']->open('layouts/base_without_infobox'));
         $template->set_attribute('url', $this->getPluginURL()."/adminer/adminer.php");

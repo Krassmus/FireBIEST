@@ -107,7 +107,7 @@ class AdminerPlugin extends Adminer {
 	}
 
 	function database() {
-		$args = func_get_args();
+        $args = func_get_args();
 		return $this->_applyPlugin(__FUNCTION__, $args);
 	}
 

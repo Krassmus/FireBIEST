@@ -1,7 +1,10 @@
 <?php
+
+
+
 function adminer_object() {
     // required to run any plugin
-    include_once "./plugins/plugin.php";
+    include_once dirname(__file__)."/plugin.php";
     
     // autoloader
     foreach (glob("plugins/*.php") as $filename) {
@@ -11,7 +14,8 @@ function adminer_object() {
     $plugins = array(
         // specify enabled plugins here
         new AdminerFrames,
-        new AdminerDumpZip
+        new AdminerDumpZip,
+        new AdminerAutologin
     );
     
     /* It is possible to combine customization and plugins:
