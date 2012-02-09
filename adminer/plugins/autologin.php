@@ -25,22 +25,14 @@ class AdminerAutologin {
         );
     }
     
-    /*function database() {
-        // database name, will be escaped by Adminer
-        $this->fetchVars();
-        return $this->database;
-    }*/
-    
     protected function fetchVars() {
         if (file_exists(dirname(__file__)."/../config.php")) {
             include dirname(__file__)."/../config.php";
-            unlink(dirname(__file__)."/../config.php");
             $this->server = $STUDIP_DB_SERVER;
             $this->username = $STUDIP_DB_USER;
             $this->database = $STUDIP_DB_NAME;
             $this->password = $STUDIP_DB_PASSWORD;
         }
     }
-	
 }
 
