@@ -35,8 +35,6 @@ class FireBIEST extends StudIPPlugin implements SystemPlugin {
         global $perm;
         parent::__construct();
 
-        $this->template_factory = new Flexi_TemplateFactory($GLOBALS['STUDIP_BASE_PATH']);
-        $this->template_path = "public/".$this->getPluginPath()."/templates";
         $navigation = new AutoNavigation($this->getDisplayname(), PluginEngine::getURL($this, array(), 'jslint'));
         
         PageLayout::addHeadElement("script",
@@ -105,51 +103,55 @@ class FireBIEST extends StudIPPlugin implements SystemPlugin {
         $js_files = $this->getJSFiles("assets/javascripts/");
         $js_files = array_merge($js_files, $this->getJSFiles("plugins_packages/"));
         
-        $template = $this->template_factory->open($this->template_path.'/check.php');
-        $template->set_layout($GLOBALS['template_factory']->open('layouts/base_without_infobox'));
+        $template = $this->getTemplate('check.php');
         $template->set_attribute('js_files', $js_files);
-        print $template->render();
+        echo $template->render();
         return;
     }
 
     public function tests_action() {
-        global $STUDIP_BASE_PATH, $PHP_PATH, $PLUGINS_PATH;
-        
         Navigation::getItem('/FireBIEST/tests')->setImage($GLOBALS['ABSOLUTE_URI_STUDIP'].$this->getPluginPath().'/images/unit-test_black.png');
         
         $db = DBManager::get();
         $path = Request::get("path");
-        $params = array();
-        if (Config::get()->getValue("FIREBIEST_TEST_WITH_DB") == "1") {
-            $params[] = "db=1";
-            if (Config::get()->getValue("FIREBIEST_KEEP_MOCK_TABLES") != "1") {
-                $params[] = "clean=1";
-            }
-        }
-        if ($path) {
-            $params[] = "path=".rawurlencode($path);
-        }
-        $testergebnis = file_get_contents($this->getPluginURL()."/unit_test.php".($params ? "?".implode("&", $params) : ""));
-
         $plugins = $db->query(
             "SELECT * FROM plugins " .
         "")->fetchAll(PDO::FETCH_ASSOC);
         foreach ($plugins as $key => $plugin) {
-            if (!file_exists($PLUGINS_PATH."/".$plugin['pluginpath'])) {
+            if (!file_exists($GLOBALS['PLUGINS_PATH']."/".$plugin['pluginpath'])) {
                 unset($plugins[$key]);
             }
-            if ($plugin['pluginpath'] === $path) {
-                $selected_plugin = $plugin['pluginname'];
-            }
         }
-        $selected_plugin || $selected_plugin = _("Stud.IP Kern");
+            
+        if ($path) {
+            $params = array();
+            if (Config::get()->getValue("FIREBIEST_TEST_WITH_DB") == "1") {
+                $params[] = "db=1";
+                if (Config::get()->getValue("FIREBIEST_KEEP_MOCK_TABLES") != "1") {
+                    $params[] = "clean=1";
+                }
+            }
+            if ($path) {
+                $params[] = "path=".rawurlencode($path);
+            }
+            $testergebnis = file_get_contents($this->getPluginURL()."/unit_test.php".($params ? "?".implode("&", $params) : ""));
 
-        $template = $this->template_factory->open($this->template_path.'/tests.php');
-        $template->set_layout($GLOBALS['template_factory']->open('layouts/base_without_infobox'));
-        $template->set_attribute('testergebnis', $testergebnis);
+            foreach ($plugins as $key => $plugin) {
+                if ($plugin['pluginpath'] === $path) {
+                    $selected_plugin = $plugin['pluginname'];
+                }
+            }
+            $selected_plugin || $selected_plugin = _("Stud.IP Kern");
+            
+            $template = $this->getTemplate('tests.php');
+            $template->set_attribute('testergebnis', $testergebnis);
+            $template->set_attribute('selected_path', $path);
+            $template->set_attribute('selected_plugin', $selected_plugin);
+        } else {
+            $template = $this->getTemplate('tests_default.php');
+        }
+
         $template->set_attribute('plugins', $plugins);
-        $template->set_attribute('selected_path', $path);
-        $template->set_attribute('selected_plugin', $selected_plugin);
         print $template->render();
     }
     
@@ -167,8 +169,7 @@ class FireBIEST extends StudIPPlugin implements SystemPlugin {
         fwrite($config_file, '$STUDIP_DB_PASSWORD = "'.$GLOBALS['DB_STUDIP_PASSWORD'].'"; ');
         fclose($config_file);
         
-        $template = $this->template_factory->open($this->template_path.'/adminer.php');
-        $template->set_layout($GLOBALS['template_factory']->open('layouts/base_without_infobox'));
+        $template = $this->getTemplate('adminer.php');
         $template->set_attribute('url', $this->getPluginURL()."/adminer/adminer.php");
         echo $template->render();
     }
@@ -185,8 +186,7 @@ class FireBIEST extends StudIPPlugin implements SystemPlugin {
     	    $configs[$config_name] = Config::get()->getValue($config_name);
     	}
     	
-    	$template = $this->template_factory->open($this->template_path.'/settings.php');
-        $template->set_layout($GLOBALS['template_factory']->open('layouts/base'));
+    	$template = $this->getTemplate('settings.php', 'with_infobox');
         $template->set_attribute('configs', $configs);
         $template->set_attribute('infobox', array(
             'picture' => "infobox/administration.jpg",
@@ -233,6 +233,22 @@ class FireBIEST extends StudIPPlugin implements SystemPlugin {
             }
         }
         return $return_array;
+    }
+    
+    protected function getTemplate($template_file_name, $layout = "without_infobox") {
+        if (!$this->template_factory) {
+            $this->template_factory = new Flexi_TemplateFactory(dirname(__file__)."/templates");
+        }
+        $template = $this->template_factory->open($template_file_name);
+        if ($layout) {
+            if (method_exists($this, "getDisplayName")) {
+                PageLayout::setTitle($this->getDisplayName());
+            } else {
+                PageLayout::setTitle(get_class($this));
+            }
+            $template->set_layout($GLOBALS['template_factory']->open($layout === "without_infobox" ? 'layouts/base_without_infobox' : 'layouts/base'));
+        }
+        return $template;
     }
 
 
