@@ -41,5 +41,11 @@
                    name="FIREBIEST_KEEP_MOCK_TABLES" <?= $configs['FIREBIEST_KEEP_MOCK_TABLES'] ? " checked" : "" ?>
                    onChange="jQuery.ajax({ url: '<?= $save_url ?>', data: { checked: this.checked ? 1 : 0, config_name: this.id } });"></td>
     </tr>
+	<tr>
+        <td><label for="FIREBIEST_CLEAN_CACHE"><?= _("Cache bei jedem Seitenaufruf leeren") ?></label></td>
+        <td><input type="checkbox" id="FIREBIEST_CLEAN_CACHE"
+                   name="FIREBIEST_CLEAN_CACHE" <?= $configs['FIREBIEST_CLEAN_CACHE'] ? " checked" : "" ?>
+                   onChange="jQuery.ajax({ url: '<?= $save_url ?>', data: { checked: this.checked ? 1 : 0, config_name: this.id } });"></td>
+    </tr>
 </table>
 </form>

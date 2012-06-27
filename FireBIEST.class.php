@@ -34,7 +34,7 @@ class FireBIEST extends StudIPPlugin implements SystemPlugin {
     public function __construct() {
         global $perm;
         parent::__construct();
-
+		
         $navigation = new AutoNavigation($this->getDisplayname(), PluginEngine::getURL($this, array(), 'jslint'));
         
         PageLayout::addHeadElement("script",
@@ -61,6 +61,10 @@ class FireBIEST extends StudIPPlugin implements SystemPlugin {
         if ($configs["FIREBIEST_TEST_HTML"]) {
             $options .= "STUDIP.htmltest.HTMLLint(); ";
         }
+		if ($configs["FIREBIEST_CLEAN_CACHE"]) {
+			SimpleORMap::expireTableScheme();
+			$GLOBALS['CACHING_ENABLE'] = false;
+		}
         if ($options) {
             PageLayout::addHeadElement("script", array(), 'jQuery(function () { '.$options.' });');
         }
@@ -185,7 +189,7 @@ class FireBIEST extends StudIPPlugin implements SystemPlugin {
     	foreach (Config::get()->getFields("global", "plugins", "FIREBIEST_") as $config_name) {
     	    $configs[$config_name] = Config::get()->getValue($config_name);
     	}
-    	
+		
     	$template = $this->getTemplate('settings.php', 'with_infobox');
         $template->set_attribute('configs', $configs);
         $template->set_attribute('infobox', array(

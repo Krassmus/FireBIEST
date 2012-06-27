@@ -10,7 +10,7 @@ class CreateConfigKeepMockTables extends Migration {
     public function up() {
 	    $config = Config::get();
         if (!isset($config["FIREBIEST_KEEP_MOCK_TABLES"])) {
-            Config::get()->create("FIREBIEST_KEEP_MOCK_TABLES", array('section' => "FireBIEST", 'is_default' => 0, 'value' => 0, 'type' => "boolean", 'range' => "global", 'description' => "should the mock-tables in the database be kept after a unit-test?", 'comment' => ""));
+            Config::get()->create("FIREBIEST_KEEP_MOCK_TABLES", array('section' => "plugins", 'is_default' => 0, 'value' => 0, 'type' => "boolean", 'range' => "global", 'description' => "should the mock-tables in the database be kept after a unit-test?", 'comment' => ""));
         }
 	}
 	
