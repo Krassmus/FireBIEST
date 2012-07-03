@@ -5,7 +5,6 @@ div#errors > div {
   padding: 5px;
   background-color: #ffffdd;
 }
-
 </style>
 
 <h2><?= _("Plugins testen") ?></h2>
