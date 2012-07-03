@@ -49,3 +49,16 @@
     </tr>
 </table>
 </form>
+
+<?
+$infobox = array(
+    'picture' => $GLOBALS['ABSOLUTE_URI_STUDIP'].$plugin->getPluginPath()."/images/balrog_infobox.png",
+    'content' => array(
+        array(
+            'kategorie' => _("Information"),
+            'eintrag' => array(
+                array('icon' => "icons/16/grey/info", 'text' => _("Alle Klicks werden sofort gespeichert."))
+            )
+        )
+    )
+);

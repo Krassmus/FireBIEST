@@ -122,41 +122,36 @@ class FireBIEST extends StudIPPlugin implements SystemPlugin {
             "SELECT * FROM plugins " .
         "")->fetchAll(PDO::FETCH_ASSOC);
         foreach ($plugins as $key => $plugin) {
-            if (!file_exists($GLOBALS['PLUGINS_PATH']."/".$plugin['pluginpath'])) {
+            if (!file_exists($GLOBALS['PLUGINS_PATH']."/".$plugin['pluginpath']."/tests")) {
                 unset($plugins[$key]);
             }
         }
             
-        if ($path) {
-            $params = array();
-            if (Config::get()->getValue("FIREBIEST_TEST_WITH_DB") == "1") {
-                $params[] = "db=1";
-                if (Config::get()->getValue("FIREBIEST_KEEP_MOCK_TABLES") != "1") {
-                    $params[] = "clean=1";
-                }
-            }
-            if ($path) {
-                $params[] = "path=".rawurlencode($path);
-            }
-            $testergebnis = file_get_contents($this->getPluginURL()."/unit_test.php".($params ? "?".implode("&", $params) : ""));
+        $template = $this->getTemplate('tests_default.php', "with_infobox");
+        
+        $template->set_attribute('plugins', $plugins);
+        $template->set_attribute('plugin', $this);
+        print $template->render();
+    }
 
-            foreach ($plugins as $key => $plugin) {
-                if ($plugin['pluginpath'] === $path) {
-                    $selected_plugin = $plugin['pluginname'];
-                }
-            }
-            $selected_plugin || $selected_plugin = _("Stud.IP Kern");
-            
-            $template = $this->getTemplate('tests.php');
-            $template->set_attribute('testergebnis', $testergebnis);
-            $template->set_attribute('selected_path', $path);
-            $template->set_attribute('selected_plugin', $selected_plugin);
-        } else {
-            $template = $this->getTemplate('tests_default.php');
+    public function ajax_tests_action() {
+        $path = Request::get("plugin");
+        if (!Request::get("plugin")) {
+            throw new Exception("Kein Plugin angegeben.");
         }
 
-        $template->set_attribute('plugins', $plugins);
-        print $template->render();
+        $params = array();
+        if (Config::get()->getValue("FIREBIEST_TEST_WITH_DB") == "1") {
+            $params[] = "db=1";
+            if (Config::get()->getValue("FIREBIEST_KEEP_MOCK_TABLES") != "1") {
+                $params[] = "clean=1";
+            }
+        }
+        $params[] = "path=".rawurlencode(Request::get("plugin"));
+
+        $testergebnis = file_get_contents($this->getPluginURL()."/unit_test.php".($params ? "?".implode("&", $params) : ""));
+
+        print $testergebnis;
     }
     
     public function database_action() {
@@ -192,17 +187,7 @@ class FireBIEST extends StudIPPlugin implements SystemPlugin {
 		
     	$template = $this->getTemplate('settings.php', 'with_infobox');
         $template->set_attribute('configs', $configs);
-        $template->set_attribute('infobox', array(
-            'picture' => "infobox/administration.jpg",
-            'content' => array(
-                array(
-                    'kategorie' => _("Information"),
-                    'eintrag' => array(
-                        array('icon' => "icons/16/grey/info", 'text' => _("Alle Klicks werden sofort gespeichert."))
-                    )
-                )
-            )
-        ));
+        $template->set_attribute('plugin', $this);
         $template->set_attribute('save_url', PluginEngine::getURL($this, array(), "savesettings"));
         print $template->render();
         return;

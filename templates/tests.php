@@ -70,3 +70,24 @@ div#errors > div {
         jQuery("#result").text(result);
     });
 </script>
+
+<?
+$infobox = array(
+    'picture' => $GLOBALS['ABSOLUTE_URI_STUDIP'].$plugin->getPluginPath()."/images/balrog_infobox.png",
+    'content' => array(
+        array(
+            'kategorie' => _("Information"),
+            'eintrag' => array(
+                array(
+                    'icon' => "icons/16/black/info",
+                    'text' => _("Es können nur Plugins getestet werden. Die Kern-Tests arbeiten mit PHP-Unit.")
+                ),
+                array(
+                    'icon' => "icons/16/black/info",
+                    'text' => _("Im Plugin-Verzeichnis muss ein Verzeichnis \"tests\" liegen mit \"_test.php\" oder \"_testdb.php\" Dateien darin. Siehe Beispiel des FireBIEST-Plugins.")
+                )
+            )
+        )
+        
+    )
+);

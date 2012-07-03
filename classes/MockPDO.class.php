@@ -1,12 +1,14 @@
 <?php
 
 /**
- * Ein PDO-Wrapper, um die Datenbank etwas näher zu beleuchten.
+ * Ein PDO-Wrapper, um alle Requests auf die virtuelle Test-Datenbank umzuleiten
  */
+
+require_once 'lib/classes/TextFormat.php';
 
 class MockPDO extends StudipPDO {
 
-    protected $table_prefix = "mock_db_";
+    protected static $table_prefix = "mock_db_";
     protected $lastQuery = "";
 
     public function query($sql) {
@@ -26,14 +28,42 @@ class MockPDO extends StudipPDO {
     }
 
     protected function alterSQL($sql) {
-        $sql = preg_replace("/(TABLE\sIF\sNOT\sEXISTS|TABLE\sIF\sEXISTS|TABLE)[\s`]+([^\s|`]+)[\s`]+/", "$1 `".$this->table_prefix.'$2'."`", $sql);
-        $sql = preg_replace("/FROM[\s`]+([^\s|`]+)[\s`]+/", "FROM `".$this->table_prefix.'$1'."`", $sql);
-        $sql = preg_replace("/JOIN[\s`]+([^\s`]+)[\s`]+/", "JOIN `".$this->table_prefix.'$1'."`", $sql);
-        $sql = preg_replace("/INTO[\s`]+([^\s|`]+)[\s`]+/", "INTO `".$this->table_prefix.'$1'."`", $sql);
-        $sql = preg_replace("/UPDATE[\s`]+([^\s|`]+)[\s`]+/", "UPDATE `".$this->table_prefix.'$1'."`", $sql);
-        //MockDB braucht Projektionen in den Selects, da table_name.field nicht verändert werden kann.
-        //Also entweder immer Projektionen oder niemals. Daher lieber immer.
-        //$sql = preg_replace("/([\s`]+)([[^\s]|`]+[^`]*)\.([^\s]+)\s/", "$1".$this->table_prefix.'$1`.`$2` ', $sql);
+        //Alle Tabellennamen im SQL-statement werden ersetzt durch mock_db_<tabellennamen>
+        $forbidden_tables = array("IF", "FROM");
+        $table_names = array();
+        preg_match_all("/(?:TABLE\sIF\sNOT\sEXISTS|TABLE\sIF\sEXISTS|TABLE|FROM|JOIN|INTO)\s+([^\s\.\-`]+)/", $sql, $matches1);
+        preg_match_all("/(?:TABLE\sIF\sNOT\sEXISTS|TABLE\sIF\sEXISTS|TABLE|FROM|JOIN|INTO)\s*`([^\s`]+)`/", $sql, $matches2);
+        foreach ($matches1[1] as $table_name) {
+            if (!in_array($table_name, $table_names) && !in_array(strtoupper($table_name), $forbidden_tables)) {
+                $table_names[] = $table_name;
+            }
+        }
+        foreach ($matches2[1] as $table_name) {
+            if (!in_array($table_name, $table_names) && !in_array(strtoupper($table_name), $forbidden_tables)) {
+                $table_names[] = $table_name;
+            }
+        }
+        
+        $sql_parser = new TextFormat();
+        $sql_parser->addMarkup("string_quote1", '"', '"', function ($markup, $matches, $contents) {
+            return '"'.$contents.'"';
+        });
+        $sql_parser->addMarkup("string_quote2", "'", "'", function ($markup, $matches, $contents) {
+            return "'".$contents."'";
+        });
+
+        foreach ($table_names as $table_name) {
+            $sql_parser->addMarkup(
+                "rename_".$table_name,
+                "([^\w_\-])(".$table_name.")([^\w_\-]|$)",
+                "",
+                function ($markup, $matches) {
+                    return $matches[1].MockPDO::getTablePrefix().$matches[2].$matches[3];
+                }
+            );
+        }
+        $sql = $sql_parser->format($sql);
+
         $this->lastQuery = $sql;
         return $sql;
     }
@@ -43,10 +73,14 @@ class MockPDO extends StudipPDO {
     }
 
     public function dropMockTables() {
-        $mock_tables = $this->query("SHOW TABLES LIKE '".$this->table_prefix."%'")->fetchAll(PDO::FETCH_COLUMN, 0);
+        $mock_tables = $this->query("SHOW TABLES LIKE '".MockPDO::getTablePrefix()."%'")->fetchAll(PDO::FETCH_COLUMN, 0);
         foreach ($mock_tables as $table) {
             parent::exec("DROP TABLE `".addslashes($table)."` ");
         }
+    }
+
+    static function getTablePrefix() {
+        return self::$table_prefix;
     }
 
 }
