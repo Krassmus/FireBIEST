@@ -21,7 +21,7 @@
 <select onChange="location.href='?script=' + encodeURIComponent(this.value);" id="select_js_file">
     <? foreach ($js_files as $path => $file_name) : ?>
     <option value="<?= $path ?>"<?= $_REQUEST['script'] === $path ? " selected" : "" ?>>
-        <?= $file_name ?>
+        <?= $path ?>
     </option>
     <? endforeach; ?>
 </select>

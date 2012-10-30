@@ -31,8 +31,8 @@ class MockPDO extends StudipPDO {
         //Alle Tabellennamen im SQL-statement werden ersetzt durch mock_db_<tabellennamen>
         $forbidden_tables = array("IF", "FROM");
         $table_names = array();
-        preg_match_all("/(?:TABLE\sIF\sNOT\sEXISTS|TABLE\sIF\sEXISTS|TABLE|FROM|JOIN|INTO)\s+([^\s\.\-`]+)/", $sql, $matches1);
-        preg_match_all("/(?:TABLE\sIF\sNOT\sEXISTS|TABLE\sIF\sEXISTS|TABLE|FROM|JOIN|INTO)\s*`([^\s`]+)`/", $sql, $matches2);
+        preg_match_all("/(?:TABLE\sIF\sNOT\sEXISTS|TABLE\sIF\sEXISTS|TABLE|FROM|JOIN|INTO|UPDATE)\s+([^\s\.\-`]+)/", $sql, $matches1);
+        preg_match_all("/(?:TABLE\sIF\sNOT\sEXISTS|TABLE\sIF\sEXISTS|TABLE|FROM|JOIN|INTO|UPDATE)\s*`([^\s`]+)`/", $sql, $matches2);
         foreach ($matches1[1] as $table_name) {
             if (!in_array($table_name, $table_names) && !in_array(strtoupper($table_name), $forbidden_tables)) {
                 $table_names[] = $table_name;
