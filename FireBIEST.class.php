@@ -162,10 +162,10 @@ class FireBIEST extends StudIPPlugin implements SystemPlugin {
     	
         $config_file = fopen(dirname(__file__)."/adminer/config.php", "w");
         fwrite($config_file, "<?php ");
-        fwrite($config_file, '$STUDIP_DB_SERVER = "'.$GLOBALS['DB_STUDIP_HOST'].'"; ');
-        fwrite($config_file, '$STUDIP_DB_USER = "'.$GLOBALS['DB_STUDIP_USER'].'"; ');
-        fwrite($config_file, '$STUDIP_DB_NAME = "'.$GLOBALS['DB_STUDIP_DATABASE'].'"; ');
-        fwrite($config_file, '$STUDIP_DB_PASSWORD = "'.$GLOBALS['DB_STUDIP_PASSWORD'].'"; ');
+        fwrite($config_file, '$STUDIP_DB_SERVER = '."'".$GLOBALS['DB_STUDIP_HOST']."'; ");
+        fwrite($config_file, '$STUDIP_DB_USER = '."'".$GLOBALS['DB_STUDIP_USER']."'; ");
+        fwrite($config_file, '$STUDIP_DB_NAME = '."'".$GLOBALS['DB_STUDIP_DATABASE']."'; ");
+        fwrite($config_file, '$STUDIP_DB_PASSWORD = '."'".$GLOBALS['DB_STUDIP_PASSWORD']."'; ");
         fclose($config_file);
         
         $template = $this->getTemplate('adminer.php');
