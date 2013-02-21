@@ -26,7 +26,7 @@ DBManager::getInstance()
     );
 $db = DBManager::get();
 $db->dropMockTables();
-foreach (preg_split("/;\s\n/", file_get_contents(dirname(__FILE__) . '/../../../../db/studip.sql')) as $statement) {
+foreach (preg_split("/;\s*\n/", file_get_contents(dirname(__FILE__) . '/../../../../db/studip.sql')) as $statement) {
     if (trim($statement)) {
         $db->exec($statement);
     }

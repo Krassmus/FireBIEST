@@ -77,7 +77,7 @@ class FireBIEST extends StudIPPlugin implements SystemPlugin {
         $navigation->setImage($GLOBALS['ABSOLUTE_URI_STUDIP'].$this->getPluginPath().'/images/code_white.png');
         Navigation::addItem('/FireBIEST/jslint', $navigation);
         //Unit-Tests:
-        $navigation = new AutoNavigation(_("Model-Tests"), PluginEngine::getURL($this, array(), 'tests'));
+        $navigation = new AutoNavigation(_("Unit-Tests"), PluginEngine::getURL($this, array(), 'tests'));
         $navigation->setImage($GLOBALS['ABSOLUTE_URI_STUDIP'].$this->getPluginPath().'/images/unit-test_white.png');
         Navigation::addItem('/FireBIEST/tests', $navigation);
         
@@ -148,8 +148,10 @@ class FireBIEST extends StudIPPlugin implements SystemPlugin {
             }
         }
         $params[] = "path=".rawurlencode(Request::get("plugin"));
+        
+        $url = $this->getPluginURL()."/unit_test.php".($params ? "?".implode("&", $params) : "");
 
-        $testergebnis = file_get_contents($this->getPluginURL()."/unit_test.php".($params ? "?".implode("&", $params) : ""));
+        $testergebnis = file_get_contents($url);
 
         print $testergebnis;
     }
